@@ -65,4 +65,23 @@ public class HomeController {
 		return "redirect:/";
 	}
 	
+	// alternative / better? way to create games with genres
+	@GetMapping("/games/new")
+	public String newGamePlus(Model model) {
+		model.addAttribute("newGamePlus", new Game());
+		model.addAttribute("allGames", gameServ.getGames());
+		return "game.jsp";
+	}
+	
+	@PostMapping("/games/new")
+	public String createGameWithGenres(@Valid @ModelAttribute("newGamePlus") Game newGamePlus, BindingResult result, Model model) {
+		if(result.hasErrors()) {
+			model.addAttribute("allGames", gameServ.getGames());
+			return "game.jsp";
+		} else {
+			gameServ.createGameWithGenres(newGamePlus);
+			return "redirect:/games/new";
+		}
+	}
+	
 }

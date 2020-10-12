@@ -15,39 +15,41 @@ import javax.persistence.ManyToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+
 @Entity
-@Table(name="games")
+@Table(name = "games")
 public class Game {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-	
-    @NotEmpty(message="Title is required!")
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@NotEmpty(message = "Title is required!")
 	private String title;
-    
-    @NotEmpty(message="Studio is required!")
-    private String studio;
-    
-    @NotNull(message="Year released is required!")
-    private Integer year;
-	
-    @Column(updatable=false)
-    private Date createdAt;
-    private Date updatedAt;
-    
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "games_genres", 
-        joinColumns = @JoinColumn(name = "game_id"), 
-        inverseJoinColumns = @JoinColumn(name = "genre_id")
-    )
-    private List<Genre> genres;
-	
-    public Game() {}
+
+	@NotEmpty(message = "Studio is required!")
+	private String studio;
+
+	@NotNull(message = "Year released is required!")
+	private Integer year;
+
+	@Transient
+	private String genresInput;
+
+	@Column(updatable = false)
+	private Date createdAt;
+	private Date updatedAt;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "games_genres", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
+	private List<Genre> genres;
+
+	public Game() {
+	}
 
 	public Long getId() {
 		return id;
@@ -97,6 +99,14 @@ public class Game {
 		this.updatedAt = updatedAt;
 	}
 
+	public String getGenresInput() {
+		return genresInput;
+	}
+
+	public void setGenresInput(String genresInput) {
+		this.genresInput = genresInput;
+	}
+
 	public List<Genre> getGenres() {
 		return genres;
 	}
@@ -104,15 +114,26 @@ public class Game {
 	public void setGenres(List<Genre> genres) {
 		this.genres = genres;
 	}
-    
+
 	@PrePersist
-    protected void onCreate(){
-        this.createdAt = new Date();
-    }
-    
-    @PreUpdate
-    protected void onUpdate(){
-        this.updatedAt = new Date();
-    }
-    
+	protected void onCreate() {
+		this.createdAt = new Date();
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		this.updatedAt = new Date();
+	}
+
+	public String genreDescription() {
+		String result = "";
+		for (int i=0; i<genres.size(); i++) {
+			result += genres.get(i).getName();
+			if(i < genres.size()-1) {
+				result += ", ";
+			}
+		}
+		return result;
+	}
+
 }

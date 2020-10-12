@@ -60,7 +60,7 @@
 		                  <td>${game.title}</td>
 		                  <td>${game.studio}</td>
 		                  <td>${game.year}</td>
-		                  <td>${game.genres}</td>
+		                  <td>${game.genreDescription()}</td>
 		              </tr>
 		           </c:forEach>
 		        </table>
