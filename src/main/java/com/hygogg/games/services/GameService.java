@@ -34,8 +34,14 @@ public class GameService {
 		return genreRepo.save(newGenre);
 	}
 	
-	// TODO: make sure the user hasn't already reviewed that game!
 	public Review create(Review newReview) {
+		List<Review> matchingReviews = revRepo.matchingReviews(
+				newReview.getUser().getId(), 
+				newReview.getGame().getId());
+		if(matchingReviews.size() > 0) {
+			return null;
+		}
+		newReview.setId(null);
 		return revRepo.save(newReview);
 	}
 	
@@ -77,6 +83,11 @@ public class GameService {
 		}
 		newGamePlus.setGenres(genres);
 		return gameRepo.save(newGamePlus);
+	}
+	
+	public List<Game> gamesInGenre(String genre) {
+		Optional<Genre> g = genreRepo.findGenreByName(genre);
+		return g.isPresent() ? g.get().getGames() : new ArrayList<Game>();
 	}
 
 }

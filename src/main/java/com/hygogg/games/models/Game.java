@@ -160,5 +160,16 @@ public class Game {
 		}
 		return result;
 	}
+	
+	public Double getAverageRating() {
+		if(reviews.size() == 0) {
+			return 0d;
+		}
+		Double total = 0d;
+		for(Review r: reviews) {
+			total += r.getRating();
+		}
+		return total / reviews.size();
+	}
 
 }

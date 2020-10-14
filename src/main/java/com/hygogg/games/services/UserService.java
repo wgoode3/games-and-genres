@@ -26,6 +26,11 @@ public class UserService {
 		return userRepo.save(registerringUser);
 	}
 	
+	public User getUser(Long id) {
+		Optional<User> potentialUser = userRepo.findById(id);
+		return potentialUser.isPresent() ? potentialUser.get() : null;
+	}
+	
 	public User getUser(String email) {
 		Optional<User> potentialUser = userRepo.findByEmail(email);
 		return potentialUser.isPresent() ? potentialUser.get() : null;

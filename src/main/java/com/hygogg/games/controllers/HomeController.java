@@ -32,6 +32,7 @@ public class HomeController {
 		if(loggedInUser == null) {
 			return "redirect:/";
 		}
+		model.addAttribute("title", "All Games!");
 		model.addAttribute("newGamePlus", new Game());
 		model.addAttribute("allGames", gameServ.getGames());
 		return "game.jsp";
@@ -61,7 +62,7 @@ public class HomeController {
 		return "review.jsp";
 	}
 	
-	@PostMapping("games/{id}/review")
+	@PostMapping("/games/{id}/review")
 	public String reviewGame(@Valid @ModelAttribute("newReview") Review newReview, BindingResult result, @PathVariable("id") Long id, Model model, HttpSession session) {
 		User loggedInUser = (User) session.getAttribute("user");
 		if(result.hasErrors()) {
@@ -70,8 +71,25 @@ public class HomeController {
 		}
 		newReview.setGame(gameServ.getGame(id));
 		newReview.setUser(loggedInUser);
-		gameServ.create(newReview);
+		Review r = gameServ.create(newReview);
+		if(r == null) {
+			result.rejectValue("content", "unique", "You have already reviewed this game!");
+			model.addAttribute("someGame", gameServ.getGame(id));
+			return "review.jsp";
+		}
 		return "redirect:/games/" + id;
+	}
+	
+	@GetMapping("/genre/{genre}")
+	public String gamesInGenre(@PathVariable("genre") String genre, Model model, HttpSession session) {
+		User loggedInUser = (User) session.getAttribute("user");
+		if(loggedInUser == null) {
+			return "redirect:/";
+		}
+		model.addAttribute("title", "Genre: " + genre);
+		model.addAttribute("newGamePlus", new Game());
+		model.addAttribute("allGames", gameServ.gamesInGenre(genre));
+		return "game.jsp";
 	}
 	
 	// TODO: talk about reserved words

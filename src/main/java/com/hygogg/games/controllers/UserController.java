@@ -1,5 +1,7 @@
 package com.hygogg.games.controllers;
 
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -10,8 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.hygogg.games.models.Game;
 import com.hygogg.games.models.LoginUser;
+import com.hygogg.games.models.Review;
 import com.hygogg.games.models.User;
+import com.hygogg.games.services.GameService;
 import com.hygogg.games.services.UserService;
 
 
@@ -19,9 +24,11 @@ import com.hygogg.games.services.UserService;
 public class UserController {
 
 	private static UserService userServ;
+	private static GameService gameServ;
 	
-	public UserController(UserService userServ) {
+	public UserController(UserService userServ, GameService gameServ) {
 		this.userServ = userServ;
+		this.gameServ = gameServ;
 	}
 	
 	@GetMapping("/")
@@ -65,6 +72,23 @@ public class UserController {
 	public String logout(HttpSession session) {
 		session.removeAttribute("user");
 		return "redirect:/";
+	}
+	
+	@GetMapping("/user")
+	public String userProfile(HttpSession session, Model model) {
+		User loggedInUser = (User) session.getAttribute("user");
+		if(loggedInUser == null) {
+			return "redirect:/";
+		}
+		User userFromDB = userServ.getUser(loggedInUser.getId());
+		model.addAttribute("user", userFromDB);
+		// create a list of games we haven't yet reviewed...
+		List<Game> otherGames = gameServ.getGames();
+		for(Review r: userFromDB.getReviews()) {
+			otherGames.remove(r.getGame());
+		}
+		model.addAttribute("gamesToReview", otherGames);
+		return "userProfile.jsp";
 	}
 	
 }

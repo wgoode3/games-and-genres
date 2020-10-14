@@ -13,9 +13,9 @@
 </head>
 <body>
     <div class="container">    
-        <h1>Games and Genres</h1>
+        <h1>${title}</h1>
         <div class="row">
-           <div class="col-sm-6">
+           <div class="col-sm-4">
                <form:form action="/games/new" method="post" modelAttribute="newGamePlus">
                    <div class="form-group">
                        <label>Title</label>
@@ -40,13 +40,14 @@
                    <input type="submit" value="Add Game" class="btn btn-primary" />
                </form:form>
            </div>
-           <div class="col-sm-6">
+           <div class="col-sm-8">
                <table class="table">
                    <tr>
                        <th>Title</th>
                        <th>Studio</th>
                        <th>Year</th>
                        <th>Genres</th>
+                       <th>Average Rating</th>
                    </tr>
                    <c:forEach items="${allGames}" var="game">
                       <tr>
@@ -54,6 +55,7 @@
                           <td>${game.studio}</td>
                           <td>${game.year}</td>
                           <td>${game.genreDescription()}</td>
+                          <td>${game.getAverageRating()}</td>
                       </tr>
                    </c:forEach>
                 </table>
