@@ -24,7 +24,7 @@ public class UserController {
 		this.userServ = userServ;
 	}
 	
-	@GetMapping("/sign_in")
+	@GetMapping("/")
 	public String signIn(Model model) {
 		model.addAttribute("registerringUser", new User());
 		model.addAttribute("loginUser", new LoginUser());
@@ -45,7 +45,7 @@ public class UserController {
 			return "signIn.jsp";
 		} else {
 			session.setAttribute("user", userServ.create(registerringUser));
-			return "redirect:/sign_in";
+			return "redirect:/home";
 		}
 	}
 	
@@ -57,14 +57,14 @@ public class UserController {
 			return "signIn.jsp";
 		} else {
 			session.setAttribute("user", loggingInUser);
-			return "redirect:/sign_in";
+			return "redirect:/home";
 		}
 	}
 	
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {
 		session.removeAttribute("user");
-		return "redirect:/sign_in";
+		return "redirect:/";
 	}
 	
 }

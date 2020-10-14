@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -47,6 +49,13 @@ public class Game {
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "games_genres", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
 	private List<Genre> genres;
+	
+	@OneToMany(mappedBy="game", fetch = FetchType.LAZY)
+    private List<Review> reviews;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private User user;
 
 	public Game() {
 	}
@@ -113,6 +122,22 @@ public class Game {
 
 	public void setGenres(List<Genre> genres) {
 		this.genres = genres;
+	}
+
+	public List<Review> getReviews() {
+		return reviews;
+	}
+
+	public void setReviews(List<Review> reviews) {
+		this.reviews = reviews;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	@PrePersist

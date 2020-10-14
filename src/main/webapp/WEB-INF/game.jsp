@@ -50,7 +50,7 @@
                    </tr>
                    <c:forEach items="${allGames}" var="game">
                       <tr>
-                          <td>${game.title}</td>
+                          <td><a href="/games/${game.id}">${game.title}</a></td>
                           <td>${game.studio}</td>
                           <td>${game.year}</td>
                           <td>${game.genreDescription()}</td>

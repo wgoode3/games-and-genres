@@ -1,7 +1,6 @@
 package com.hygogg.games.controllers;
 
-import java.util.List;
-
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -9,11 +8,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hygogg.games.models.Game;
-import com.hygogg.games.models.Genre;
+import com.hygogg.games.models.Review;
+import com.hygogg.games.models.User;
 import com.hygogg.games.services.GameService;
 
 
@@ -26,62 +26,54 @@ public class HomeController {
 		this.gameServ = gameServ;
 	}
 	
-	@GetMapping("/")
-	public String index(Model model) {
-		model.addAttribute("newGame", new Game());
-		model.addAttribute("newGenre", new Genre());
-		model.addAttribute("allGames", gameServ.getGames());
-		model.addAttribute("allGenres", gameServ.getGenres());
-		return "index.jsp";
-	}
-	
-	@PostMapping("/games")
-	public String newGame(@Valid @ModelAttribute("newGame") Game newGame, BindingResult result) {
-		if(result.hasErrors()) {
-			return "index.jsp";
-		} else {
-			gameServ.create(newGame);
+	@GetMapping("/home")
+	public String newGamePlus(Model model, HttpSession session) {
+		User loggedInUser = (User) session.getAttribute("user");
+		if(loggedInUser == null) {
 			return "redirect:/";
 		}
-	}
-	
-	@PostMapping("/genres")
-	public String newGenre(@Valid @ModelAttribute("newGenre") Genre newGenre, BindingResult result) {
-		if(result.hasErrors()) {
-			return "index.jsp";
-		} else {
-			gameServ.create(newGenre);
-			return "redirect:/";
-		}
-	}
-	
-	@PostMapping("/add_genre")
-	public String addGenreToGame(@RequestParam("game_id") Long gameId, @RequestParam("genre_id") Long genreId) {
-		Game theGame = gameServ.getGame(gameId);
-		Genre theGenre = gameServ.getGenre(genreId);
-		List<Genre> gameGenres = theGame.getGenres();
-		gameGenres.add(theGenre);
-		gameServ.saveGame(theGame);
-		return "redirect:/";
-	}
-	
-	// alternative / better? way to create games with genres
-	@GetMapping("/games/new")
-	public String newGamePlus(Model model) {
 		model.addAttribute("newGamePlus", new Game());
 		model.addAttribute("allGames", gameServ.getGames());
 		return "game.jsp";
 	}
 	
 	@PostMapping("/games/new")
-	public String createGameWithGenres(@Valid @ModelAttribute("newGamePlus") Game newGamePlus, BindingResult result, Model model) {
+	public String createGameWithGenres(@Valid @ModelAttribute("newGamePlus") Game newGamePlus, BindingResult result, Model model, HttpSession session) {
 		if(result.hasErrors()) {
 			model.addAttribute("allGames", gameServ.getGames());
 			return "game.jsp";
 		} else {
+			User loggedInUser = (User) session.getAttribute("user");
+			newGamePlus.setUser(loggedInUser);
 			gameServ.createGameWithGenres(newGamePlus);
-			return "redirect:/games/new";
+			return "redirect:/home";
 		}
 	}
+	
+	@GetMapping("/games/{id}")
+	public String showGame(@PathVariable("id") Long id, Model model, HttpSession session) {
+		User loggedInUser = (User) session.getAttribute("user");
+		if(loggedInUser == null) {
+			return "redirect:/";
+		}
+		model.addAttribute("someGame", gameServ.getGame(id));
+		model.addAttribute("newReview", new Review());
+		return "review.jsp";
+	}
+	
+	@PostMapping("games/{id}/review")
+	public String reviewGame(@Valid @ModelAttribute("newReview") Review newReview, BindingResult result, @PathVariable("id") Long id, Model model, HttpSession session) {
+		User loggedInUser = (User) session.getAttribute("user");
+		if(result.hasErrors()) {
+			model.addAttribute("someGame", gameServ.getGame(id));
+			return "review.jsp";
+		}
+		newReview.setGame(gameServ.getGame(id));
+		newReview.setUser(loggedInUser);
+		gameServ.create(newReview);
+		return "redirect:/games/" + id;
+	}
+	
+	// TODO: talk about reserved words
 	
 }

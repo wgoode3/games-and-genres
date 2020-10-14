@@ -1,12 +1,15 @@
 package com.hygogg.games.models;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -44,6 +47,12 @@ public class User {
 	@Column(updatable = false)
 	private Date createdAt;
 	private Date updatedAt;
+	
+	@OneToMany(mappedBy="user", fetch = FetchType.LAZY)
+    private List<Game> games;
+	
+	@OneToMany(mappedBy="user", fetch = FetchType.LAZY)
+    private List<Review> reviews;
 	
 	public User() {}
 	
@@ -112,6 +121,22 @@ public class User {
 		this.updatedAt = updatedAt;
 	}
 	
+	public List<Game> getGames() {
+		return games;
+	}
+
+	public void setGames(List<Game> games) {
+		this.games = games;
+	}
+
+	public List<Review> getReviews() {
+		return reviews;
+	}
+
+	public void setReviews(List<Review> reviews) {
+		this.reviews = reviews;
+	}
+
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = new Date();

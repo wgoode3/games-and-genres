@@ -8,18 +8,22 @@ import org.springframework.stereotype.Service;
 
 import com.hygogg.games.models.Game;
 import com.hygogg.games.models.Genre;
+import com.hygogg.games.models.Review;
 import com.hygogg.games.repositories.GameRepository;
 import com.hygogg.games.repositories.GenreRepository;
+import com.hygogg.games.repositories.ReviewRepository;
 
 @Service
 public class GameService {
 	
 	private static GameRepository gameRepo;
 	private static GenreRepository genreRepo;
+	private static ReviewRepository revRepo;
 	
-	public GameService(GameRepository gameRepo, GenreRepository genreRepo) {
+	public GameService(GameRepository gameRepo, GenreRepository genreRepo, ReviewRepository revRepo) {
 		this.gameRepo = gameRepo;
 		this.genreRepo = genreRepo;
+		this.revRepo = revRepo;
 	}
 	
 	public Game create(Game newGame) {
@@ -28,6 +32,11 @@ public class GameService {
 	
 	public Genre create(Genre newGenre) {
 		return genreRepo.save(newGenre);
+	}
+	
+	// TODO: make sure the user hasn't already reviewed that game!
+	public Review create(Review newReview) {
+		return revRepo.save(newReview);
 	}
 	
 	public List<Genre> getGenres() {
